@@ -1,33 +1,41 @@
 let gridScaleSlider, bleedSlider, invertCheckbox;
-let theShader;
-
-function preload() {
-  theShader = loadShader('shader.vert', 'shader.glsl');
-}
+let canvas;
 
 function setup() {
-  const canvas = createCanvas(windowHeight * 9 / 16, windowHeight, WEBGL);
-  canvas.parent('canvas-container');
-  noStroke();
+  const canvasParent = select('#canvas-holder');
+  const h = windowHeight;
+  const w = h * 9 / 16; // 9:16 aspect ratio
 
-  // UI bindings
+  canvas = createCanvas(w, h);
+  canvas.parent(canvasParent.elt);
+
   gridScaleSlider = select('#gridScale');
   bleedSlider = select('#bleedIntensity');
   invertCheckbox = select('#invertDots');
+  noStroke();
+  frameRate(30);
 }
 
 function draw() {
-  shader(theShader);
+  const gridSize = int(gridScaleSlider.value());
+  const bleed = float(bleedSlider.value());
+  const invert = invertCheckbox.elt.checked;
 
-  theShader.setUniform('u_resolution', [width, height]);
-  theShader.setUniform('u_time', millis() / 1000.0);
-  theShader.setUniform('u_gridScale', float(gridScaleSlider.value()));
-  theShader.setUniform('u_bleed', float(bleedSlider.value()));
-  theShader.setUniform('u_invert', invertCheckbox.checked() ? 1.0 : 0.0);
+  background(invert ? 255 : 0);
 
-  rect(0, 0, width, height);
+  for (let y = 0; y < height; y += gridSize) {
+    for (let x = 0; x < width; x += gridSize) {
+      let noiseVal = noise(x * 0.005, y * 0.005, millis() * 0.0003);
+      let intensity = map(noiseVal, 0, 1, 0, 255 * bleed);
+      let size = map(noiseVal, 0, 1, 2, gridSize * 0.75);
+      fill(invert ? 0 : 255, intensity);
+      ellipse(x + gridSize / 2, y + gridSize / 2, size, size);
+    }
+  }
 }
 
 function windowResized() {
-  resizeCanvas(windowHeight * 9 / 16, windowHeight);
+  const h = windowHeight;
+  const w = h * 9 / 16;
+  resizeCanvas(w, h);
 }
