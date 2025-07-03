@@ -1,12 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Ink Diffusion</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <title>Ink Diffusion - Pure GLSL</title>
+  <style>body, html { margin:0; width:100%; height:100%; overflow:hidden; background:#000; }</style>
 </head>
 <body>
-  <script src="sketch.js"></script>
+  <canvas id="glcanvas"></canvas>
+  <script src="https://cdn.jsdelivr.net/npm/glslCanvas@0.2.0/dist/GlslCanvas.min.js"></script>
+  <script src="shader.frag"></script>
+  <script>
+    const canvas = document.getElementById('glcanvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const sandbox = new GlslCanvas(canvas);
+    sandbox.load(document.querySelector('script[type="x-shader/x-fragment"]'));
+  </script>
 </body>
 </html>
