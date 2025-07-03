@@ -1,52 +1,47 @@
-const sketch = (p) => {
-  let gridScaleSlider, bleedSlider, invertCheckbox;
-  let canvas;
+let theShader;
+let shaderTexture;
+let gridSlider, bleedSlider, invertCheckbox;
+let canvasContainer;
 
-  p.setup = () => {
-    gridScaleSlider = document.getElementById('gridScale');
-    bleedSlider = document.getElementById('bleedIntensity');
-    invertCheckbox = document.getElementById('invertDots');
+function preload() {
+  theShader = loadShader('shader.vert', 'shader.glsl');
+}
 
-    const h = window.innerHeight;
-    const w = h * 9 / 16;
+function setup() {
+  // Create canvas in target container
+  canvasContainer = document.getElementById('canvas-container');
+  let c = createCanvas(1080, 1920, WEBGL);
+  if (canvasContainer) {
+    c.parent(canvasContainer);
+  } else {
+    console.warn('canvas-container not found in HTML.');
+  }
 
-    canvas = p.createCanvas(w, h);
-    const canvasHolder = document.getElementById('canvas-holder');
-    if (canvasHolder) {
-      canvas.parent(canvasHolder);
-    } else {
-      console.error("canvas-holder not found!");
-    }
+  noStroke();
 
-    p.noStroke();
-    p.frameRate(30);
-  };
+  // Set up shaderTexture
+  shaderTexture = createGraphics(1080, 1920, WEBGL);
+  shaderTexture.noStroke();
 
-  p.draw = () => {
-    if (!gridScaleSlider || !bleedSlider || !invertCheckbox) return;
+  // UI Elements
+  gridSlider = document.getElementById('grid-slider');
+  bleedSlider = document.getElementById('bleed-slider');
+  invertCheckbox = document.getElementById('invert-checkbox');
+}
 
-    const gridSize = parseInt(gridScaleSlider.value);
-    const bleed = parseFloat(bleedSlider.value);
-    const invert = invertCheckbox.checked;
+function draw() {
+  const gridScale = parseFloat(gridSlider?.value || 20.0);
+  const bleedIntensity = parseFloat(bleedSlider?.value || 0.5);
+  const invertDots = invertCheckbox?.checked ? 1.0 : 0.0;
 
-    p.background(invert ? 255 : 0);
+  shaderTexture.shader(theShader);
+  theShader.setUniform('u_resolution', [shaderTexture.width, shaderTexture.height]);
+  theShader.setUniform('u_time', millis() / 1000.0);
+  theShader.setUniform('u_gridScale', gridScale);
+  theShader.setUniform('u_bleedIntensity', bleedIntensity);
+  theShader.setUniform('u_invertDots', invertDots);
 
-    for (let y = 0; y < p.height; y += gridSize) {
-      for (let x = 0; x < p.width; x += gridSize) {
-        let noiseVal = p.noise(x * 0.01, y * 0.01, p.millis() * 0.0005);
-        let intensity = p.map(noiseVal, 0, 1, 0, 255 * bleed);
-        let size = p.map(noiseVal, 0, 1, 2, gridSize * 0.75);
-        p.fill(invert ? 0 : 255, intensity);
-        p.ellipse(x + gridSize / 2, y + gridSize / 2, size, size);
-      }
-    }
-  };
-
-  p.windowResized = () => {
-    const h = window.innerHeight;
-    const w = h * 9 / 16;
-    p.resizeCanvas(w, h);
-  };
-};
-
-new p5(sketch);
+  shaderTexture.rect(0, 0, width, height);
+  texture(shaderTexture);
+  rect(-width / 2, -height / 2, width, height);
+}
