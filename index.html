@@ -35,46 +35,55 @@ uniform vec2 u_resolution;
 uniform float u_time;
 
 float random(vec2 st) {
-  return fract(sin(dot(st, vec2(12.9898,78.233))) * 43758.5453);
+  return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453);
 }
 
 float noise(vec2 st) {
   vec2 i = floor(st);
   vec2 f = fract(st);
+
+  // Four corners of the square
   float a = random(i);
-  float b = random(i + vec2(1.0,0.0));
-  float c = random(i + vec2(0.0,1.0));
-  float d = random(i + vec2(1.0,1.0));
-  vec2 u = f*f*(3.0-2.0*f);
-  return mix(a,b,u.x) + (c-a)*u.y*(1.0-u.x) + (d-b-c+a)*u.x*u.y;
+  float b = random(i + vec2(1.0, 0.0));
+  float c = random(i + vec2(0.0, 1.0));
+  float d = random(i + vec2(1.0, 1.0));
+
+  // Smooth interpolation (smootherstep)
+  vec2 u = f * f * (3.0 - 2.0 * f);
+
+  // Bilinear interpolation
+  return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
 }
 
 void main() {
+  // Normalized pixel coordinates (centered)
   vec2 st = gl_FragCoord.xy / u_resolution.xy;
   st -= 0.5;
   st *= u_resolution / min(u_resolution.x, u_resolution.y);
 
   float t = u_time * 0.2;
 
+  // Layered noise for rich diffusion
   float n = 0.0;
   n += 0.5 * noise(st * 4.0 + t);
   n += 0.25 * noise(st * 8.0 - t * 1.2);
   n += 0.125 * noise(st * 16.0 + t * 2.5);
 
-  // Radial mask (center-focused)
+  // Radial mask to create a blooming effect
   float dist = length(st);
   float mask = smoothstep(0.6, 0.05, dist);
 
-  // Ink tone: warm black/brown
+  // Warm ink tone (brown/black)
   vec3 ink = vec3(0.06, 0.03, 0.015);
 
+  // Final color
   vec3 color = ink * n * 2.0 * mask;
 
   gl_FragColor = vec4(color, 1.0);
 }
   </script>
 
-  <!-- Launch GLSL Canvas -->
+  <!-- Launch GLSLCanvas -->
   <script>
     const canvas = document.getElementById("glcanvas");
     canvas.width = window.innerWidth;
