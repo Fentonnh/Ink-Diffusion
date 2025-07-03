@@ -1,39 +1,38 @@
-<script id="frag" type="x-shader/x-fragment">
 #ifdef GL_ES
 precision mediump float;
 #endif
 
-uniform vec2 u_resolution;
 uniform float u_time;
+uniform vec2 u_resolution;
+uniform sampler2D u_texture;
 
-float random(vec2 st) {
-  return fract(sin(dot(st, vec2(12.9898,78.233))) * 43758.5453);
+float luminance(vec3 color) {
+    return dot(color, vec3(0.299, 0.587, 0.114));
 }
 
-float noise(vec2 st) {
-  vec2 i = floor(st);
-  vec2 f = fract(st);
-  float a = random(i);
-  float b = random(i + vec2(1.0,0.0));
-  float c = random(i + vec2(0.0,1.0));
-  float d = random(i + vec2(1.0,1.0));
-  vec2 u = f*f*(3.0-2.0*f);
-  return mix(a,b,u.x) + (c-a)*u.y*(1.0-u.x) + (d-b)*u.x*u.y;
+void main() {
+    vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+
+    // Add wave-like distortion to simulate ink bleed
+    vec2 animatedUV = uv + 0.01 * vec2(
+        sin(uv.y * 40.0 + u_time * 0.6),
+        cos(uv.x * 40.0 + u_time * 0.6)
+    );
+
+    // Create halftone grid
+    float scale = 100.0;
+    vec2 gridUV = floor(animatedUV * scale) / scale;
+    vec2 center = (floor(animatedUV * scale) + 0.5) / scale;
+
+    vec3 color = texture2D(u_texture, animatedUV).rgb;
+    float bright = luminance(color);
+
+    float dist = distance(animatedUV, center);
+
+    float bleed = 0.03 + 0.01 * sin(u_time + bright * 10.0);
+    float radius = (1.0 - bright) * 0.5 / scale + bleed;
+
+    float dot = smoothstep(radius + 0.001, radius - 0.001, dist);
+
+    gl_FragColor = vec4(vec3(dot), 1.0);
 }
-
-void main(){
-  vec2 st = gl_FragCoord.xy / u_resolution.xy;
-  st -= 0.5;
-  st *= u_resolution / min(u_resolution.x, u_resolution.y);
-
-  float t = u_time * 0.2;
-
-  float n = 0.0;
-  n += 0.5 * noise(st * 4.0 + t);
-  n += 0.25 * noise(st * 8.0 - t * 1.2);
-  n += 0.125 * noise(st * 16.0 + t * 2.5);
-
-  vec3 color = vec3(n);
-  gl_FragColor = vec4(color,1.0);
-}
-</script>
