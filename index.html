@@ -2,88 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Ink Diffusion – Monochrome</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: black;
-      overflow: hidden;
-      height: 100%;
-      width: 100%;
-    }
-    canvas {
-      display: block;
-      width: 100vw;
-      height: 100vh;
-    }
-  </style>
+  <title>Ink Diffusion</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
 </head>
 <body>
-  <canvas id="glcanvas"></canvas>
-
-  <!-- GLSLCanvas -->
-  <script src="https://cdn.jsdelivr.net/npm/glslCanvas@0.2.0/dist/GlslCanvas.min.js"></script>
-
-  <!-- Fragment Shader -->
-  <script id="fragShader" type="x-shader/x-fragment">
-#ifdef GL_ES
-precision mediump float;
-#endif
-
-uniform vec2 u_resolution;
-uniform float u_time;
-
-float random(vec2 st) {
-  return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453);
-}
-
-float noise(vec2 st) {
-  vec2 i = floor(st);
-  vec2 f = fract(st);
-
-  float a = random(i);
-  float b = random(i + vec2(1.0, 0.0));
-  float c = random(i + vec2(0.0, 1.0));
-  float d = random(i + vec2(1.0, 1.0));
-
-  vec2 u = f * f * (3.0 - 2.0 * f);
-  return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
-}
-
-void main() {
-  vec2 st = gl_FragCoord.xy / u_resolution.xy;
-  st -= 0.5;
-  st *= u_resolution / min(u_resolution.x, u_resolution.y);
-
-  float t = u_time * 0.2;
-
-  float n = 0.0;
-  n += 0.5   * noise(st * 2.0 + t);
-  n += 0.25  * noise(st * 4.0 - t * 1.2);
-  n += 0.125 * noise(st * 8.0 + t * 2.5);
-
-  float dist = length(st);
-  float mask = smoothstep(0.75, 0.05, dist);
-
-  float brightness = 2.8;
-
-  // Final monochrome ink color
-  vec3 color = vec3(n * brightness * mask);
-
-  gl_FragColor = vec4(color, 1.0);
-}
-  </script>
-
-  <!-- Launch -->
-  <script>
-    const canvas = document.getElementById("glcanvas");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const sandbox = new GlslCanvas(canvas);
-    const frag = document.getElementById("fragShader");
-    sandbox.load(frag.textContent);
-  </script>
+  <div id="container">
+    <div id="controls">
+      <h2>Customize</h2>
+      <label>Grid Scale: <input type="range" id="gridScale" min="20" max="200" value="100" /></label>
+      <label>Bleed Intensity: <input type="range" id="bleedAmount" min="0" max="100" value="30" /></label>
+      <label>Invert Dots: <input type="checkbox" id="invertDots" /></label>
+    </div>
+    <div id="canvas-holder">
+      <!-- p5 canvas will render here -->
+    </div>
+  </div>
+  <script src="sketch.js"></script>
 </body>
 </html>
