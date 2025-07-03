@@ -4,18 +4,20 @@ precision mediump float;
 
 uniform float u_time;
 uniform vec2 u_resolution;
-uniform sampler2D u_texture;
-
 uniform float u_scale;
 uniform float u_bleed;
 uniform float u_invert;
+
+float noise(vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+}
 
 float luminance(vec3 color) {
     return dot(color, vec3(0.299, 0.587, 0.114));
 }
 
 void main() {
-    vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+    vec2 uv = gl_FragCoord.xy / u_resolution;
 
     vec2 animatedUV = uv + 0.01 * vec2(
         sin(uv.y * 40.0 + u_time * 0.6),
@@ -26,8 +28,7 @@ void main() {
     vec2 gridUV = floor(animatedUV * scale) / scale;
     vec2 center = (floor(animatedUV * scale) + 0.5) / scale;
 
-    vec3 color = texture2D(u_texture, animatedUV).rgb;
-    float bright = luminance(color);
+    float bright = noise(animatedUV + u_time);
     float dist = distance(animatedUV, center);
 
     float bleed = 0.03 + u_bleed * sin(u_time + bright * 10.0);
