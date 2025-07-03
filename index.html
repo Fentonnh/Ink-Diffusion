@@ -2,28 +2,80 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ink Diffusion</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: white;
+    }
+
+    #controls {
+      width: 300px;
+      background: #1e1e1e;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    #controls h2 {
+      margin-top: 0;
+      font-size: 24px;
+    }
+
+    #controls label {
+      display: block;
+      margin-top: 15px;
+    }
+
+    #controls input[type="range"],
+    #controls input[type="checkbox"] {
+      width: 100%;
+    }
+
+    #canvas-holder {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #111;
+    }
+
+    canvas {
+      border: none;
+    }
+  </style>
 </head>
 <body>
-  <div id="container">
-    <div id="controls">
-      <h2>Customize</h2>
-      <label for="gridScale">Grid Scale:</label>
-      <input type="range" id="gridScale" min="2" max="50" value="10">
-
-      <label for="bleedIntensity">Bleed Intensity:</label>
-      <input type="range" id="bleedIntensity" min="0" max="1" step="0.01" value="0.3">
-
-      <label>
-        <input type="checkbox" id="invertDots">
-        Invert Dots
-      </label>
-    </div>
-    <div id="canvas-container"></div>
+  <div id="controls">
+    <h2>Customize</h2>
+    <label>
+      Grid Scale:
+      <input type="range" id="gridScale" min="5" max="80" value="30" step="1">
+    </label>
+    <label>
+      Bleed Intensity:
+      <input type="range" id="bleedIntensity" min="0" max="1" value="0.5" step="0.01">
+    </label>
+    <label>
+      <input type="checkbox" id="invertDots">
+      Invert Dots
+    </label>
   </div>
 
+  <div id="canvas-holder"></div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
-  <script src="sketch.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const script = document.createElement('script');
+      script.src = 'sketch.js';
+      document.body.appendChild(script);
+    });
+  </script>
 </body>
 </html>
