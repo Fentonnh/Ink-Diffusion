@@ -1,22 +1,23 @@
-let theShader;
+let inkShader;
+let pg;
 
 function preload() {
-  theShader = loadShader("shader.vert", "shader.frag",
-    () => console.log("Shader loaded"),
-    (err) => console.error("Shader failed:", err)
-  );
+  inkShader = loadShader('shader.glsl', 'shader.glsl');
 }
 
 function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL);
   noStroke();
+  pg = createGraphics(width, height, WEBGL);
 }
 
 function draw() {
-    shader(theShader);
-  theShader.setUniform("u_time", millis() / 1000.0);
-  theShader.setUniform("u_resolution", [width, height]);
+  inkShader.setUniform('u_resolution', [width, height]);
+  inkShader.setUniform('u_time', millis() / 1000.0);
+  inkShader.setUniform('u_texture', pg);
 
-  // DRAW FULL SCREEN RECTANGLE to trigger the shader
-  rect(-width / 2, -height / 2, width, height);
+  pg.shader(inkShader);
+  pg.rect(0, 0, width, height);
+
+  image(pg, -width / 2, -height / 2, width, height);
 }
