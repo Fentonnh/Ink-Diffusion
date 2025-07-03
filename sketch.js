@@ -7,7 +7,13 @@ function preload() {
 
 function setup() {
   const container = select('#canvas-container');
-  let canvas = createCanvas(container.width, container.height, WEBGL);
+  
+  // Maintain 9:16 aspect ratio for Instagram Reels
+  const containerWidth = container.width;
+  const canvasHeight = container.height;
+  const canvasWidth = canvasHeight * (9 / 16);
+  
+  let canvas = createCanvas(canvasWidth, canvasHeight, WEBGL);
   canvas.parent('canvas-container');
 
   noStroke();
@@ -20,7 +26,12 @@ function setup() {
 
 function windowResized() {
   const container = select('#canvas-container');
-  resizeCanvas(container.width, container.height);
+  const containerWidth = container.width;
+  const containerHeight = container.height;
+  const canvasHeight = containerHeight;
+  const canvasWidth = canvasHeight * (9 / 16);
+
+  resizeCanvas(canvasWidth, canvasHeight);
 }
 
 function draw() {
