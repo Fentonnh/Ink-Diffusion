@@ -2,17 +2,16 @@ let gridScaleSlider, bleedSlider, invertCheckbox;
 let canvas;
 
 function setup() {
-  const canvasParent = select('#canvas-holder');
-  const h = windowHeight;
+  const canvasHolder = document.getElementById('canvas-holder');
+  const h = window.innerHeight;
   const w = h * 9 / 16;
 
   canvas = createCanvas(w, h);
-  canvas.parent(canvasParent.elt);
-  canvas.style('display', 'block');
+  canvas.parent(canvasHolder);
 
-  gridScaleSlider = select('#gridScale');
-  bleedSlider = select('#bleedIntensity');
-  invertCheckbox = select('#invertDots');
+  gridScaleSlider = document.getElementById('gridScale');
+  bleedSlider = document.getElementById('bleedIntensity');
+  invertCheckbox = document.getElementById('invertDots');
 
   noStroke();
   frameRate(30);
@@ -21,9 +20,9 @@ function setup() {
 function draw() {
   if (!gridScaleSlider || !bleedSlider || !invertCheckbox) return;
 
-  const gridSize = int(gridScaleSlider.value());
-  const bleed = float(bleedSlider.value());
-  const invert = invertCheckbox.elt.checked;
+  const gridSize = parseInt(gridScaleSlider.value);
+  const bleed = parseFloat(bleedSlider.value);
+  const invert = invertCheckbox.checked;
 
   background(invert ? 255 : 0);
 
@@ -39,7 +38,7 @@ function draw() {
 }
 
 function windowResized() {
-  const h = windowHeight;
+  const h = window.innerHeight;
   const w = h * 9 / 16;
   resizeCanvas(w, h);
 }
