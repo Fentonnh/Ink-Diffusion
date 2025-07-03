@@ -3,21 +3,20 @@ const sketch = (p) => {
   let canvas;
 
   p.setup = () => {
-    const canvasHolder = document.getElementById('canvas-holder');
-    if (!canvasHolder) {
-      console.error('Canvas holder not found!');
-      return;
-    }
+    gridScaleSlider = document.getElementById('gridScale');
+    bleedSlider = document.getElementById('bleedIntensity');
+    invertCheckbox = document.getElementById('invertDots');
 
     const h = window.innerHeight;
     const w = h * 9 / 16;
 
     canvas = p.createCanvas(w, h);
-    canvas.parent(canvasHolder);
-
-    gridScaleSlider = document.getElementById('gridScale');
-    bleedSlider = document.getElementById('bleedIntensity');
-    invertCheckbox = document.getElementById('invertDots');
+    const canvasHolder = document.getElementById('canvas-holder');
+    if (canvasHolder) {
+      canvas.parent(canvasHolder);
+    } else {
+      console.error("canvas-holder not found!");
+    }
 
     p.noStroke();
     p.frameRate(30);
@@ -34,7 +33,7 @@ const sketch = (p) => {
 
     for (let y = 0; y < p.height; y += gridSize) {
       for (let x = 0; x < p.width; x += gridSize) {
-        let noiseVal = p.noise(x * 0.005, y * 0.005, p.millis() * 0.0003);
+        let noiseVal = p.noise(x * 0.01, y * 0.01, p.millis() * 0.0005);
         let intensity = p.map(noiseVal, 0, 1, 0, 255 * bleed);
         let size = p.map(noiseVal, 0, 1, 2, gridSize * 0.75);
         p.fill(invert ? 0 : 255, intensity);
@@ -50,4 +49,4 @@ const sketch = (p) => {
   };
 };
 
-new p5(sketch); // ← This runs everything only when the DOM is ready
+new p5(sketch);
