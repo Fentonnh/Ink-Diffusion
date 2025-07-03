@@ -4,19 +4,23 @@ let canvas;
 function setup() {
   const canvasParent = select('#canvas-holder');
   const h = windowHeight;
-  const w = h * 9 / 16; // 9:16 aspect ratio
+  const w = h * 9 / 16;
 
   canvas = createCanvas(w, h);
   canvas.parent(canvasParent.elt);
+  canvas.style('display', 'block');
 
   gridScaleSlider = select('#gridScale');
   bleedSlider = select('#bleedIntensity');
   invertCheckbox = select('#invertDots');
+
   noStroke();
   frameRate(30);
 }
 
 function draw() {
+  if (!gridScaleSlider || !bleedSlider || !invertCheckbox) return;
+
   const gridSize = int(gridScaleSlider.value());
   const bleed = float(bleedSlider.value());
   const invert = invertCheckbox.elt.checked;
