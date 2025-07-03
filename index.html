@@ -2,22 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ink Diffusion</title>
   <link rel="stylesheet" href="style.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
 </head>
 <body>
-  <div id="container">
+  <div id="app">
     <div id="controls">
       <h2>Customize</h2>
-      <label>Grid Scale: <input type="range" id="gridScale" min="20" max="200" value="100" /></label>
-      <label>Bleed Intensity: <input type="range" id="bleedAmount" min="0" max="100" value="30" /></label>
-      <label>Invert Dots: <input type="checkbox" id="invertDots" /></label>
+      <label for="grid">Grid Scale:</label>
+      <input type="range" id="grid" min="2" max="30" value="10" />
+      <br />
+      <label for="bleed">Bleed Intensity:</label>
+      <input type="range" id="bleed" min="0" max="1" step="0.01" value="0.5" />
+      <br />
+      <label><input type="checkbox" id="invert" /> Invert Dots</label>
     </div>
-    <div id="canvas-holder">
-      <!-- p5 canvas will render here -->
-    </div>
+    <div id="canvas-container"></div>
   </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
   <script src="sketch.js"></script>
 </body>
 </html>
