@@ -2,42 +2,41 @@
 precision mediump float;
 #endif
 
-uniform float u_time;
 uniform vec2 u_resolution;
-uniform float u_scale;
+uniform float u_time;
+uniform float u_gridScale;
 uniform float u_bleed;
 uniform float u_invert;
 
-float noise(vec2 st) {
-    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+float random(vec2 st) {
+  return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
-float luminance(vec3 color) {
-    return dot(color, vec3(0.299, 0.587, 0.114));
+float noise(vec2 st) {
+  vec2 i = floor(st);
+  vec2 f = fract(st);
+  float a = random(i);
+  float b = random(i + vec2(1.0, 0.0));
+  float c = random(i + vec2(0.0, 1.0));
+  float d = random(i + vec2(1.0, 1.0));
+  vec2 u = smoothstep(0.0, 1.0, f);
+  return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
 }
 
 void main() {
-    vec2 uv = gl_FragCoord.xy / u_resolution;
+  vec2 st = gl_FragCoord.xy / u_resolution.xy;
+  st.x *= u_resolution.x / u_resolution.y;
+  vec2 grid = floor(st * u_gridScale);
 
-    vec2 animatedUV = uv + 0.01 * vec2(
-        sin(uv.y * 40.0 + u_time * 0.6),
-        cos(uv.x * 40.0 + u_time * 0.6)
-    );
+  float n = noise(grid + u_time * 0.2);
+  float bleed = smoothstep(0.5, 0.5 + u_bleed * 0.2, n);
 
-    float scale = u_scale;
-    vec2 gridUV = floor(animatedUV * scale) / scale;
-    vec2 center = (floor(animatedUV * scale) + 0.5) / scale;
+  float d = distance(fract(st * u_gridScale), vec2(0.5));
+  float dotmask = smoothstep(0.25, 0.05, d);
 
-    float bright = noise(animatedUV + u_time);
-    float dist = distance(animatedUV, center);
+  float ink = dotmask * bleed;
 
-    float bleed = 0.03 + u_bleed * sin(u_time + bright * 10.0);
-    float radius = (1.0 - bright) * 0.5 / scale + bleed;
+  float col = u_invert > 0.5 ? ink : 1.0 - ink;
 
-    float dot = smoothstep(radius + 0.001, radius - 0.001, dist);
-
-    // Invert if checkbox is checked
-    dot = mix(dot, 1.0 - dot, u_invert);
-
-    gl_FragColor = vec4(vec3(dot), 1.0);
+  gl_FragColor = vec4(vec3(col), 1.0);
 }
