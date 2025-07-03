@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Ink Diffusion – GLSL</title>
+  <title>Ink Diffusion – Monochrome</title>
   <style>
     html, body {
       margin: 0;
@@ -22,10 +22,10 @@
 <body>
   <canvas id="glcanvas"></canvas>
 
-  <!-- GLSLCanvas Runtime -->
+  <!-- GLSLCanvas -->
   <script src="https://cdn.jsdelivr.net/npm/glslCanvas@0.2.0/dist/GlslCanvas.min.js"></script>
 
-  <!-- Embedded Fragment Shader -->
+  <!-- Fragment Shader -->
   <script id="fragShader" type="x-shader/x-fragment">
 #ifdef GL_ES
 precision mediump float;
@@ -58,29 +58,24 @@ void main() {
 
   float t = u_time * 0.2;
 
-  // Zoomed out noise scale for smoother gradients
   float n = 0.0;
   n += 0.5   * noise(st * 2.0 + t);
   n += 0.25  * noise(st * 4.0 - t * 1.2);
   n += 0.125 * noise(st * 8.0 + t * 2.5);
 
-  // Radial fade from center
   float dist = length(st);
-  float mask = smoothstep(0.7, 0.1, dist);
+  float mask = smoothstep(0.75, 0.05, dist);
 
-  // Warm black-brown ink tone
-  vec3 ink = vec3(0.08, 0.04, 0.015);
-
-  // Boost visibility
   float brightness = 2.8;
 
-  vec3 color = ink * n * brightness * mask;
+  // Final monochrome ink color
+  vec3 color = vec3(n * brightness * mask);
 
   gl_FragColor = vec4(color, 1.0);
 }
   </script>
 
-  <!-- Launch GLSLCanvas -->
+  <!-- Launch -->
   <script>
     const canvas = document.getElementById("glcanvas");
     canvas.width = window.innerWidth;
