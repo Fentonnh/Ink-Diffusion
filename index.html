@@ -2,25 +2,67 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ink Diffusion</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background-color: #111;
+      color: white;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #controls {
+      width: 300px;
+      background: #1e1e1e;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    #controls h2 {
+      margin-top: 0;
+    }
+
+    #controls label {
+      display: block;
+      margin-top: 15px;
+    }
+
+    #canvas-container {
+      flex: 1;
+      position: relative;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.2);
+      margin-right: 5px;
+    }
+  </style>
 </head>
 <body>
-  <div id="app">
-    <div id="controls">
-      <h2>Customize</h2>
-      <label for="grid">Grid Scale:</label>
-      <input type="range" id="grid" min="2" max="30" value="10" />
-      <br />
-      <label for="bleed">Bleed Intensity:</label>
-      <input type="range" id="bleed" min="0" max="1" step="0.01" value="0.5" />
-      <br />
-      <label><input type="checkbox" id="invert" /> Invert Dots</label>
-    </div>
-    <div id="canvas-container"></div>
+  <div id="controls">
+    <h2>Customize</h2>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
-    <script src="sketch.js"></script>
+    <label for="grid">Grid Scale:</label>
+    <input type="range" id="grid" min="2" max="30" value="10" />
+
+    <label for="bleed">Bleed Intensity:</label>
+    <input type="range" id="bleed" min="0" max="1" step="0.01" value="0.5" />
+
+    <label><input type="checkbox" id="invert" /> Invert Dots</label>
   </div>
+
+  <div id="canvas-container"></div>
+
+  <!-- Load P5.js first, then your sketch -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+  <script src="sketch.js"></script>
 </body>
 </html>
