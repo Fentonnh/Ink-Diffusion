@@ -13,7 +13,7 @@ function setup() {
 }
 
 function draw() {
-  shader(theShader);
+    shader(theShader);
   theShader.setUniform("u_time", millis() / 1000.0);
   theShader.setUniform("u_resolution", [width, height]);
 
