@@ -1,47 +1,33 @@
-let shaderProgram;
-let gridSlider, bleedSlider, invertCheckbox;
+let gridScaleSlider, bleedSlider, invertCheckbox;
+let theShader;
 
 function preload() {
-  shaderProgram = loadShader('shader.vert', 'shader.glsl');
+  theShader = loadShader('shader.vert', 'shader.glsl');
 }
 
 function setup() {
-  const container = select('#canvas-container');
-  
-  // Maintain 9:16 aspect ratio for Instagram Reels
-  const containerWidth = container.width;
-  const canvasHeight = container.height;
-  const canvasWidth = canvasHeight * (9 / 16);
-  
-  let canvas = createCanvas(canvasWidth, canvasHeight, WEBGL);
+  const canvas = createCanvas(windowHeight * 9 / 16, windowHeight, WEBGL);
   canvas.parent('canvas-container');
-
   noStroke();
-  pixelDensity(1);
 
-  gridSlider = select('#grid');
-  bleedSlider = select('#bleed');
-  invertCheckbox = select('#invert');
-}
-
-function windowResized() {
-  const container = select('#canvas-container');
-  const containerWidth = container.width;
-  const containerHeight = container.height;
-  const canvasHeight = containerHeight;
-  const canvasWidth = canvasHeight * (9 / 16);
-
-  resizeCanvas(canvasWidth, canvasHeight);
+  // UI bindings
+  gridScaleSlider = select('#gridScale');
+  bleedSlider = select('#bleedIntensity');
+  invertCheckbox = select('#invertDots');
 }
 
 function draw() {
-  shader(shaderProgram);
+  shader(theShader);
 
-  shaderProgram.setUniform('u_resolution', [width, height]);
-  shaderProgram.setUniform('u_time', millis() / 1000.0);
-  shaderProgram.setUniform('u_gridScale', float(gridSlider.value()));
-  shaderProgram.setUniform('u_bleed', float(bleedSlider.value()));
-  shaderProgram.setUniform('u_invert', invertCheckbox.checked() ? 1.0 : 0.0);
+  theShader.setUniform('u_resolution', [width, height]);
+  theShader.setUniform('u_time', millis() / 1000.0);
+  theShader.setUniform('u_gridScale', float(gridScaleSlider.value()));
+  theShader.setUniform('u_bleed', float(bleedSlider.value()));
+  theShader.setUniform('u_invert', invertCheckbox.checked() ? 1.0 : 0.0);
 
   rect(0, 0, width, height);
+}
+
+function windowResized() {
+  resizeCanvas(windowHeight * 9 / 16, windowHeight);
 }
