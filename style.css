@@ -2,9 +2,9 @@ body, html {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background: #111;
-  color: white;
   font-family: sans-serif;
+  background-color: #111;
+  color: #fff;
 }
 
 #app {
@@ -15,14 +15,15 @@ body, html {
 
 #controls {
   width: 250px;
-  background: #1e1e1e;
   padding: 20px;
+  background-color: #1e1e1e;
   box-sizing: border-box;
 }
 
 #canvas-container {
   flex: 1;
   position: relative;
+  background: #000;
 }
 
 canvas {
