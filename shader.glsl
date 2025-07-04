@@ -1,31 +1,29 @@
+// shader.glsl
 #ifdef GL_ES
 precision mediump float;
 #endif
 
+varying vec2 vTexCoord;
+
 uniform vec2 u_resolution;
 uniform float u_time;
-uniform sampler2D u_tex;
 uniform float u_gridScale;
 uniform float u_bleed;
 uniform float u_invert;
-
-varying vec2 vTexCoord;
+uniform sampler2D u_tex;
 
 void main() {
   vec2 uv = vTexCoord;
   float scale = u_gridScale;
-  vec2 grid = floor(uv * scale);
-  vec2 gridUV = grid / scale;
+  vec2 gridUV = floor(uv * scale) / scale;
 
-  vec4 textColor = texture2D(u_tex, gridUV);
-  float brightness = textColor.r;
+  float brightness = texture2D(u_tex, gridUV).r;
+  float radius = brightness * 0.15 + 0.005;
+  radius += sin(u_time + gridUV.x * 10.0 + gridUV.y * 10.0) * u_bleed * 0.05;
 
-  float radius = brightness * 0.1 + 0.01;
-  radius += sin(u_time + grid.x * 0.2 + grid.y * 0.3) * u_bleed * 0.05;
+  float dist = length(fract(uv * scale) - 0.5);
+  float ink = smoothstep(radius, radius - 0.01, dist);
 
-  float distToCenter = length(fract(uv * scale) - 0.5);
-  float ink = smoothstep(radius, radius - 0.01, distToCenter);
-
-  float output = u_invert > 0.5 ? 1.0 - ink : ink;
-  gl_FragColor = vec4(vec3(output), 1.0);
+  float result = mix(ink, 1.0 - ink, u_invert);
+  gl_FragColor = vec4(vec3(result), 1.0);
 }
