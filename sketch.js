@@ -2,7 +2,7 @@ let shaderProgram;
 let fontGraphics;
 
 function preload() {
-  shaderProgram = loadShader("shader.vert", "shader.frag");
+  shaderProgram = loadShader('shader.vert', 'shader.frag');
 }
 
 function setup() {
@@ -12,22 +12,24 @@ function setup() {
 
   fontGraphics = createGraphics(width, height);
   fontGraphics.pixelDensity(1);
+  fontGraphics.textFont('monospace');
   fontGraphics.textAlign(CENTER, CENTER);
-  fontGraphics.textSize(48);
-  fontGraphics.fill(255);
-  fontGraphics.noStroke();
+  fontGraphics.textSize(64);
+  fontGraphics.textLeading(70);
 }
 
 function windowResized() {
   const container = document.getElementById("canvas-container");
   resizeCanvas(container.offsetWidth, container.offsetHeight);
-  fontGraphics.resizeCanvas(width, height);
 }
 
 function draw() {
-  // Draw the dynamic quote into an offscreen buffer
   fontGraphics.clear();
-  const quote = document.getElementById("quoteInput").value || "The unknown is not your enemy,\nit is your birthplace.";
+  fontGraphics.drawingContext.filter = 'blur(1px)';
+  fontGraphics.background(0);
+  fontGraphics.fill(255);
+
+  let quote = document.getElementById("quoteInput").value || "The unknown is not your enemy,\nit is your birthplace.";
   fontGraphics.text(quote, width / 2, height / 2);
 
   shader(shaderProgram);
