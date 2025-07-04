@@ -3,8 +3,6 @@
 precision mediump float;
 #endif
 
-varying vec2 vTexCoord;
-
 uniform vec2 u_resolution;
 uniform float u_time;
 uniform float u_gridScale;
@@ -12,18 +10,21 @@ uniform float u_bleed;
 uniform float u_invert;
 uniform sampler2D u_tex;
 
+varying vec2 vTexCoord;
+
 void main() {
   vec2 uv = vTexCoord;
-  float scale = u_gridScale;
-  vec2 gridUV = floor(uv * scale) / scale;
+  vec2 grid = floor(uv * u_gridScale) / u_gridScale;
 
-  float brightness = texture2D(u_tex, gridUV).r;
-  float radius = brightness * 0.15 + 0.005;
-  radius += sin(u_time + gridUV.x * 10.0 + gridUV.y * 10.0) * u_bleed * 0.05;
+  vec4 textSample = texture2D(u_tex, grid);
+  float brightness = textSample.r;
 
-  float dist = length(fract(uv * scale) - 0.5);
+  float radius = brightness * 0.1 + 0.01;
+  radius += sin(u_time + grid.x * 10.0 + grid.y * 10.0) * u_bleed * 0.05;
+
+  float dist = length(fract(uv * u_gridScale) - 0.5);
   float ink = smoothstep(radius, radius - 0.01, dist);
 
-  float result = mix(ink, 1.0 - ink, u_invert);
-  gl_FragColor = vec4(vec3(result), 1.0);
+  float finalOutput = mix(ink, 1.0 - ink, u_invert);
+  gl_FragColor = vec4(vec3(finalOutput), 1.0);
 }
