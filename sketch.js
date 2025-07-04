@@ -29,20 +29,22 @@ function windowResized() {
 }
 
 function draw() {
-  if (!shaderProgram || !shaderProgram._glProgram) return;
-
-  fontBuffer.clear();
-  const q = document.getElementById('quoteInput').value;
-  fontBuffer.text(q || 'Enter a quote…', width / 2, height / 2);
+  // TEMPORARY TEST: comment out fontGraphics to test shader
+  // fontGraphics.clear();
+  // let quote = "TESTING";
+  // fontGraphics.text(quote, width / 2, height / 2);
 
   shader(shaderProgram);
-  shaderProgram.setUniform('u_resolution', [width, height]);
-  shaderProgram.setUniform('u_time', millis() / 1000);
-  shaderProgram.setUniform('u_gridScale', parseFloat(document.getElementById('grid-slider').value));
-  shaderProgram.setUniform('u_bleed', parseFloat(document.getElementById('bleed-slider').value));
-  shaderProgram.setUniform('u_invert', document.getElementById('invert-checkbox').checked ? 1.0 : 0.0);
-  shaderProgram.setUniform('u_tex', fontBuffer);
 
-  rectMode(CENTER);
-  rect(0, 0, width, height);
+  shaderProgram.setUniform("u_resolution", [width, height]);
+  shaderProgram.setUniform("u_time", millis() / 1000.0);
+  
+  // Give it a default non-transparent texture
+  shaderProgram.setUniform("u_tex", fontGraphics);
+  shaderProgram.setUniform("u_gridScale", 40.0);
+  shaderProgram.setUniform("u_bleed", 0.3);
+  shaderProgram.setUniform("u_invert", 0.0);
+
+  rect(-width / 2, -height / 2, width, height);
 }
+
