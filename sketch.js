@@ -1,65 +1,41 @@
-// sketch.js
-let theShader;
-let shaderTexture;
-let gridSlider, bleedSlider, invertCheckbox, quoteInput;
+let shaderProgram;
+let fontGraphics;
 
 function preload() {
-  theShader = loadShader('shader.vert', 'shader.glsl');
+  shaderProgram = loadShader('shader.vert', 'shader.glsl');
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight, WEBGL);
-  noStroke();
+  const container = document.getElementById("canvas-container");
+  let cnv = createCanvas(container.offsetWidth, container.offsetHeight, WEBGL);
+  cnv.parent("canvas-container");
 
-  shaderTexture = createGraphics(width, height, WEBGL);
-  shaderTexture.noStroke();
-
-  // UI Elements
-  createP('Grid Scale:').parent('ui');
-  gridSlider = createSlider(2, 100, 40, 1);
-  gridSlider.parent('ui');
-  gridSlider.style('width', '200px');
-
-  createP('Bleed Intensity:').parent('ui');
-  bleedSlider = createSlider(0, 100, 25, 1);
-  bleedSlider.parent('ui');
-  bleedSlider.style('width', '200px');
-
-  createP('Custom Quote:').parent('ui');
-  quoteInput = createInput('The unknown is not your enemy.').parent('ui');
-  quoteInput.style('width', '200px');
-
-  invertCheckbox = createCheckbox('Invert Dots', false);
-  invertCheckbox.parent('ui');
-}
-
-function draw() {
-  shaderTexture.shader(theShader);
-
-  theShader.setUniform('u_resolution', [width, height]);
-  theShader.setUniform('u_time', millis() / 1000.0);
-  theShader.setUniform('u_gridScale', gridSlider.value());
-  theShader.setUniform('u_bleed', bleedSlider.value() / 100.0);
-  theShader.setUniform('u_invert', invertCheckbox.checked());
-
-  shaderTexture.rect(0, 0, width, height);
-
-  // Render shader texture to screen
-  texture(shaderTexture);
-  rect(-width / 2, -height / 2, width, height);
-
-  // Draw text on top using blend mode for emergence
-  resetMatrix();
-  translate(-width / 2, -height / 2);
-  drawingContext.globalCompositeOperation = 'overlay';
-  fill(255);
-  textSize(48);
-  textAlign(CENTER, CENTER);
-  text(quoteInput.value(), width / 2, height / 2);
-  drawingContext.globalCompositeOperation = 'source-over';
+  fontGraphics = createGraphics(width, height);
+  fontGraphics.pixelDensity(1);
+  fontGraphics.background(0);
+  fontGraphics.fill(255);
+  fontGraphics.textAlign(CENTER, CENTER);
+  fontGraphics.textSize(64);
 }
 
 function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-  shaderTexture.resizeCanvas(width, height);
+  const container = document.getElementById("canvas-container");
+  resizeCanvas(container.offsetWidth, container.offsetHeight);
+}
+
+function draw() {
+  fontGraphics.clear();
+
+  let quote = document.getElementById("quoteInput").value || "The unknown is not your enemy,\nit is your birthplace.";
+  fontGraphics.text(quote, width / 2, height / 2);
+
+  shader(shaderProgram);
+  shaderProgram.setUniform("u_resolution", [width, height]);
+  shaderProgram.setUniform("u_time", millis() / 1000.0);
+  shaderProgram.setUniform("u_tex", fontGraphics);
+  shaderProgram.setUniform("u_gridScale", float(document.getElementById("grid-slider").value));
+  shaderProgram.setUniform("u_bleed", float(document.getElementById("bleed-slider").value));
+  shaderProgram.setUniform("u_invert", document.getElementById("invert-checkbox").checked ? 1.0 : 0.0);
+
+  rect(-width / 2, -height / 2, width, height);
 }
