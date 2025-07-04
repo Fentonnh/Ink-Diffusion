@@ -2,7 +2,12 @@ let shaderProgram;
 let fontGraphics;
 
 function preload() {
-  shaderProgram = loadShader('shader.vert', 'shader.frag');
+  // Load the shader with error handling
+  shaderProgram = loadShader('shader.vert', 'shader.frag', onShaderLoadError);
+}
+
+function onShaderLoadError(err) {
+  console.error("🛑 Shader failed to load:", err);
 }
 
 function setup() {
@@ -10,12 +15,19 @@ function setup() {
   let cnv = createCanvas(container.offsetWidth, container.offsetHeight, WEBGL);
   cnv.parent("canvas-container");
 
+  // Check for shader compilation issue
+  if (!shaderProgram) {
+    console.error("🧨 shaderProgram is undefined. Shader failed to compile.");
+    noLoop();
+    return;
+  }
+
   fontGraphics = createGraphics(width, height);
   fontGraphics.pixelDensity(1);
-  fontGraphics.textFont('monospace');
+  fontGraphics.background(0);
+  fontGraphics.fill(255);
   fontGraphics.textAlign(CENTER, CENTER);
   fontGraphics.textSize(64);
-  fontGraphics.textLeading(70);
 }
 
 function windowResized() {
@@ -25,9 +37,6 @@ function windowResized() {
 
 function draw() {
   fontGraphics.clear();
-  fontGraphics.drawingContext.filter = 'blur(1px)';
-  fontGraphics.background(0);
-  fontGraphics.fill(255);
 
   let quote = document.getElementById("quoteInput").value || "The unknown is not your enemy,\nit is your birthplace.";
   fontGraphics.text(quote, width / 2, height / 2);
