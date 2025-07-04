@@ -5,32 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ink Diffusion</title>
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: sans-serif;
+      background-color: #111;
       display: flex;
       height: 100vh;
-      background-color: #111;
+      overflow: hidden;
       color: #fff;
     }
 
     #controls {
       width: 30%;
       padding: 20px;
-      box-sizing: border-box;
       background-color: #1a1a1a;
       display: flex;
       flex-direction: column;
       gap: 1rem;
+      justify-content: flex-start;
     }
 
-    #canvas-container {
-      flex-grow: 1;
-      position: relative;
-      background: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    label {
+      font-size: 0.9rem;
     }
 
     input[type="range"],
@@ -38,14 +35,52 @@
       width: 100%;
     }
 
-    label {
-      font-size: 0.9rem;
+    #canvas-container {
+      width: 70%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #000;
     }
 
-    h2 {
-      margin-top: 0;
+    canvas {
+      max-height: 100%;
+      max-width: 100%;
     }
 
     #quoteInput {
       padding: 0.5rem;
-      background: #
+      background: #222;
+      border: 1px solid #333;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <h2>Customize</h2>
+
+    <label for="grid-slider">Grid Scale</label>
+    <input id="grid-slider" type="range" min="10" max="100" value="40" />
+
+    <label for="bleed-slider">Bleed Intensity</label>
+    <input id="bleed-slider" type="range" min="0" max="1" step="0.01" value="0.3" />
+
+    <label>
+      <input id="invert-checkbox" type="checkbox" />
+      Invert Dots
+    </label>
+
+    <label for="quoteInput">Custom Quote</label>
+    <input id="quoteInput" type="text" placeholder="Enter your quote here…" />
+  </div>
+
+  <div id="canvas-container"></div>
+
+  <!-- Load P5.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="sketch.js"></script>
+</body>
+</html>
