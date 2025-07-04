@@ -1,4 +1,6 @@
+#ifdef GL_ES
 precision mediump float;
+#endif
 
 uniform vec2 u_resolution;
 uniform float u_time;
@@ -7,8 +9,10 @@ uniform float u_gridScale;
 uniform float u_bleed;
 uniform float u_invert;
 
+varying vec2 vTexCoord;
+
 void main() {
-  vec2 uv = gl_FragCoord.xy / u_resolution;
+  vec2 uv = vTexCoord;
   float scale = u_gridScale;
   vec2 grid = floor(uv * scale);
   vec2 gridUV = grid / scale;
