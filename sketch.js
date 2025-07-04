@@ -1,47 +1,65 @@
+// sketch.js
 let theShader;
 let shaderTexture;
-let gridSlider, bleedSlider, invertCheckbox;
-let canvasContainer;
+let gridSlider, bleedSlider, invertCheckbox, quoteInput;
 
 function preload() {
   theShader = loadShader('shader.vert', 'shader.glsl');
 }
 
 function setup() {
-  // Create canvas in target container
-  canvasContainer = document.getElementById('canvas-container');
-  let c = createCanvas(1080, 1920, WEBGL);
-  if (canvasContainer) {
-    c.parent(canvasContainer);
-  } else {
-    console.warn('canvas-container not found in HTML.');
-  }
-
+  createCanvas(windowWidth, windowHeight, WEBGL);
   noStroke();
 
-  // Set up shaderTexture
-  shaderTexture = createGraphics(1080, 1920, WEBGL);
+  shaderTexture = createGraphics(width, height, WEBGL);
   shaderTexture.noStroke();
 
   // UI Elements
-  gridSlider = document.getElementById('grid-slider');
-  bleedSlider = document.getElementById('bleed-slider');
-  invertCheckbox = document.getElementById('invert-checkbox');
+  createP('Grid Scale:').parent('ui');
+  gridSlider = createSlider(2, 100, 40, 1);
+  gridSlider.parent('ui');
+  gridSlider.style('width', '200px');
+
+  createP('Bleed Intensity:').parent('ui');
+  bleedSlider = createSlider(0, 100, 25, 1);
+  bleedSlider.parent('ui');
+  bleedSlider.style('width', '200px');
+
+  createP('Custom Quote:').parent('ui');
+  quoteInput = createInput('The unknown is not your enemy.').parent('ui');
+  quoteInput.style('width', '200px');
+
+  invertCheckbox = createCheckbox('Invert Dots', false);
+  invertCheckbox.parent('ui');
 }
 
 function draw() {
-  const gridScale = parseFloat(gridSlider?.value || 20.0);
-  const bleedIntensity = parseFloat(bleedSlider?.value || 0.5);
-  const invertDots = invertCheckbox?.checked ? 1.0 : 0.0;
-
   shaderTexture.shader(theShader);
-  theShader.setUniform('u_resolution', [shaderTexture.width, shaderTexture.height]);
+
+  theShader.setUniform('u_resolution', [width, height]);
   theShader.setUniform('u_time', millis() / 1000.0);
-  theShader.setUniform('u_gridScale', gridScale);
-  theShader.setUniform('u_bleedIntensity', bleedIntensity);
-  theShader.setUniform('u_invertDots', invertDots);
+  theShader.setUniform('u_gridScale', gridSlider.value());
+  theShader.setUniform('u_bleed', bleedSlider.value() / 100.0);
+  theShader.setUniform('u_invert', invertCheckbox.checked());
 
   shaderTexture.rect(0, 0, width, height);
+
+  // Render shader texture to screen
   texture(shaderTexture);
   rect(-width / 2, -height / 2, width, height);
+
+  // Draw text on top using blend mode for emergence
+  resetMatrix();
+  translate(-width / 2, -height / 2);
+  drawingContext.globalCompositeOperation = 'overlay';
+  fill(255);
+  textSize(48);
+  textAlign(CENTER, CENTER);
+  text(quoteInput.value(), width / 2, height / 2);
+  drawingContext.globalCompositeOperation = 'source-over';
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  shaderTexture.resizeCanvas(width, height);
 }
