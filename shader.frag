@@ -1,3 +1,4 @@
+// shader.frag
 precision mediump float;
 
 uniform vec2 u_resolution;
@@ -14,27 +15,19 @@ float hash(vec2 p) {
 }
 
 void main() {
-  vec2 uv = gl_FragCoord.xy / u_resolution;
+  vec2 uv = vTexCoord; // Use vTexCoord passed from vertex shader
 
   float scale = u_gridScale;
   vec2 grid = floor(uv * scale);
   vec2 gridUV = grid / scale;
 
-  // Normalized coordinate to sample the text texture
-  vec2 texUV = uv;
-
-  // Sample the text texture
-  vec4 textColor = texture2D(u_tex, texUV);
+  vec4 textColor = texture2D(u_tex, uv);
   float brightness = textColor.r;
 
-  // Compute ink radius
   float radius = brightness * 0.1 + 0.01;
-
-  // Add organic noise variation to radius
   float n = hash(grid);
   radius += sin(u_time * 2.0 + n * 10.0) * u_bleed * 0.05;
 
-  // Compute distance to dot center and blend it
   float distToCenter = length(fract(uv * scale) - 0.5);
   float ink = smoothstep(radius, radius - 0.01, distToCenter);
 
